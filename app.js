@@ -32,7 +32,8 @@ app.get('/consultas', (req, res) => {
 app.post('/consultas', (req, res) => {
   const { data, hora, medico } = req.body;
   consultas.push({ data, hora, medico });
-  res.redirect('/consultas');
+  // Redireciona para o perfil (ajuste para /perfil/:id se tiver o id do paciente)
+  res.redirect('/perfil');
 });
 
 // Rota para a página de perfil
@@ -64,7 +65,7 @@ app.get('/perfil', (req, res) => {
 
 app.post('/paciente', (req, res) => {
   // Aqui você pode salvar os dados ou apenas exibir uma mensagem de sucesso
-  res.send('Cadastro realizado com sucesso!');
+  res.redirect('/consultas');
 });
 
 // Iniciar o servidor
