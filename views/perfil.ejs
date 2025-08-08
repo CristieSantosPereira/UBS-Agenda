@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil do Paciente</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Perfil do Paciente</h1>
+  </header>
+  <main>
+    <section>
+      <h2>Dados Pessoais</h2>
+      <ul>
+        <li><strong>Nome:</strong> <%= nome %></li>
+        <li><strong>Data de Nascimento:</strong> <%= data_nascimento %></li>
+        <li><strong>CPF:</strong> <%= cpf %></li>
+        <li><strong>Cartão do SUS:</strong> <%= cartao_sus %></li>
+        <li><strong>Telefone:</strong> <%= telefone %></li>
+        <li><strong>E-mail:</strong> <%= email %></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Histórico de Consultas</h2>
+      <ul>
+        <% consultas.forEach(consulta => { %>
+          <li>
+            <strong>Data:</strong> <%= consulta.data %>
+            <strong>Médico:</strong> <%= consulta.medico %>
+            <strong>Observações:</strong> <%= consulta.observacoes %>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
+
+Esse arquivo usa a sintaxe do EJS para renderizar dados dinâmicos. Você precisará passar os dados do paciente e do histórico de consultas para a view a partir do arquivo app.js.
+
+Por exemplo, você pode passar os dados da seguinte forma:
+
+app.get('/perfil', (req, res) => {
+  const paciente = {
+    nome: 'João Silva',
+    data_nascimento: '1990-01-01',
+    cpf: '123.456.789-00',
+    cartao_sus: '123456789012345',
+    telefone: '(11) 1234-5678',
+    email: 'joao.silva@example.com'
+  };
+
+  const consultas = [
+    {
+      data: '2022-01-01',
+      medico: 'Dr. José',
+      observacoes: 'Consulta de rotina'
+    },
+    {
+      data: '2022-02-01',
+      medico: 'Dr. Maria',
+      observacoes: 'Retorno'
+    }
+  ];
+
+  res.render('perfil', { paciente, consultas });
+});

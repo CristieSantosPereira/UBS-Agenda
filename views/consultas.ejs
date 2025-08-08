@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento de Consultas</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Agendamento de Consultas</h1>
+  </header>
+  <main>
+    <section>
+      <h2>Agende sua consulta</h2>
+      <form action="/consultas" method="post">
+        <label for="data">Data:</label>
+        <input type="date" id="data" name="data" required>
+
+        <label for="hora">Hora:</label>
+        <input type="time" id="hora" name="hora" required>
+
+        <label for="medico">Médico:</label>
+        <select id="medico" name="medico" required>
+          <option value="">Selecione um médico</option>
+          <option value="Dr. José">Dr. José</option>
+          <option value="Dra. Maria">Dra. Maria</option>
+        </select>
+
+        <button type="submit">Agendar</button>
+      </form>
+    </section>
+    <section>
+      <h2>Consultas Agendadas</h2>
+      <ul>
+        <% consultas.forEach(consulta => { %>
+          <li>
+            <strong>Data:</strong> <%= consulta.data %>
+            <strong>Hora:</strong> <%= consulta.hora %>
+            <strong>Médico:</strong> <%= consulta.medico %>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "ubs-agenda",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CristieSantosPereira/UBS-Agenda.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CristieSantosPereira/UBS-Agenda/issues"
+  },
+  "homepage": "https://github.com/CristieSantosPereira/UBS-Agenda#readme",
+  "description": "",
+  "dependencies": {
+    "ejs": "3.1.10",
+    "express": "5.1.0",
+    "sqlite3": "5.1.7"
+  }
+}
