@@ -6,6 +6,9 @@ const path = require('path');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Servir arquivos estáticos (coloque antes das rotas)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Middleware para parsear requisições
 app.use(express.urlencoded({ extended: true }));
 
@@ -14,21 +17,58 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+// Array temporário para armazenar consultas (em memória)
+let consultas = [
+  { data: '2022-01-01', hora: '09:00', medico: 'Dr. José' },
+  { data: '2022-02-01', hora: '10:00', medico: 'Dra. Maria' }
+];
+
 // Rota para a página de consultas
 app.get('/consultas', (req, res) => {
-  res.render('consultas');
+  res.render('consultas', { consultas });
+});
+
+// Rota POST para agendar nova consulta
+app.post('/consultas', (req, res) => {
+  const { data, hora, medico } = req.body;
+  consultas.push({ data, hora, medico });
+  res.redirect('/consultas');
 });
 
 // Rota para a página de perfil
 app.get('/perfil', (req, res) => {
-  res.render('perfil');
+  const paciente = {
+    nome: 'João Silva',
+    data_nascimento: '1990-01-01',
+    cpf: '123.456.789-00',
+    cartao_sus: '123456789012345',
+    telefone: '(11) 1234-5678',
+    email: 'joao.silva@example.com'
+  };
+
+  const consultas = [
+    {
+      data: '2022-01-01',
+      medico: 'Dr. José',
+      observacoes: 'Consulta de rotina'
+    },
+    {
+      data: '2022-02-01',
+      medico: 'Dr. Maria',
+      observacoes: 'Retorno'
+    }
+  ];
+
+  res.render('perfil', { paciente, consultas });
 });
 
-// Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+app.post('/paciente', (req, res) => {
+  // Aqui você pode salvar os dados ou apenas exibir uma mensagem de sucesso
+  res.send('Cadastro realizado com sucesso!');
+});
 
 // Iniciar o servidor
-const port = 3000;
+const port = 1000;
 app.listen(port, () => {
   console.log(`Servidor iniciado na porta ${port}`);
 });

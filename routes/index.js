@@ -1,58 +1,58 @@
 const express = require('express');
 const router = express.Router();
+const Paciente = require('../models/paciente');
+const Consulta = require('../models/consulta');
 
-// Rota para a página inicial
+// Página inicial
 router.get('/', (req, res) => {
   res.render('index');
 });
 
-// Rota para a página de consultas
-router.get('/consultas', (req, res) => {
-  // Lógica para buscar as consultas no banco de dados
-  const consultas = [
-    { data: '2022-01-01', hora: '10:00', medico: 'Dr. José' },
-    { data: '2022-01-02', hora: '11:00', medico: 'Dra. Maria' }
-  ];
-  res.render('consultas', { consultas });
+// Página de consultas
+router.get('/consultas', async (req, res) => {
+  try {
+    const consultas = await Consulta.buscarTodos();
+    res.render('consultas', { consultas });
+  } catch (error) {
+    res.status(500).send('Erro ao buscar consultas.');
+  }
 });
 
-// Rota para a página de perfil
-router.get('/perfil', (req, res) => {
-  const paciente = {
-    nome: 'João Silva',
-    data_nascimento: '1990-01-01',
-    cpf: '123.456.789-00',
-    cartao_sus: '123456789012345',
-    telefone: '(11) 1234-5678',
-    email: 'joao.silva@example.com'
-  };
+// Página de perfil do paciente
+router.get('/perfil/:id', async (req, res) => {
+  try {
+    const paciente = await Paciente.buscarPorId(req.params.id);
+    if (!paciente) return res.status(404).send('Paciente não encontrado.');
 
-  const consultas = [
-    {
-      data: '2022-01-01',
-      medico: 'Dr. José',
-      observacoes: 'Consulta de rotina'
-    },
-    {
-      data: '2022-01-02',
-      medico: 'Dra. Maria',
-      observacoes: 'Retorno'
-    }
-  ];
+    // Para mostrar consultas do paciente, implemente buscarPorPacienteId no model Consulta
+    const consultas = []; // Exemplo: await Consulta.buscarPorPacienteId(req.params.id);
 
-  res.render('perfil', { paciente, consultas });
+    res.render('perfil', { paciente, consultas });
+  } catch (error) {
+    res.status(500).send('Erro ao buscar perfil.');
+  }
 });
 
-// Rota para cadastrar paciente
-router.post('/paciente', (req, res) => {
-  // Lógica para salvar o paciente no banco de dados
-  res.redirect('/consultas');
+// Cadastro de paciente
+router.post('/paciente', async (req, res) => {
+  try {
+    const { nome, data_nascimento, cpf, cartao_sus, telefone, email } = req.body;
+    const id = await Paciente.criar(nome, data_nascimento, cpf, cartao_sus, telefone, email);
+    res.redirect(`/perfil/${id}`);
+  } catch (error) {
+    res.status(500).send('Erro ao cadastrar paciente.');
+  }
 });
 
-// Rota para agendar consulta
-router.post('/consultas', (req, res) => {
-  // Lógica para salvar a consulta no banco de dados
-  res.redirect('/consultas');
+// Agendamento de consulta
+router.post('/consultas', async (req, res) => {
+  try {
+    const { data, hora, medico } = req.body;
+    await Consulta.criar(data, hora, medico, null); // Passe null ou ajuste conforme necessidade
+    res.redirect('/consultas');
+  } catch (error) {
+    res.status(500).send('Erro ao agendar consulta.');
+  }
 });
 
 module.exports = router;
