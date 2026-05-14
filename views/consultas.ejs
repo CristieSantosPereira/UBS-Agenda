@@ -6,42 +6,104 @@
   <title>Agendamento de Consultas</title>
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-  <header>
-    <h1>Agendamento de Consultas</h1>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-content">
+      <h1>Agendamento de Consultas</h1>
+    </div>
   </header>
-  <main>
-    <section>
+
+  <!-- CONTEÚDO -->
+  <main class="container">
+
+    <!-- FORMULÁRIO -->
+    <section class="card">
       <h2>Agende sua consulta</h2>
-      <form action="/consultas" method="post">
-        <label for="data">Data:</label>
-        <input type="date" id="data" name="data" required>
 
-        <label for="hora">Hora:</label>
-        <input type="time" id="hora" name="hora" required>
+      <form action="/consultas" method="post" class="form">
 
-        <label for="medico">Médico:</label>
-        <select id="medico" name="medico" required>
-          <option value="">Selecione um médico</option>
-          <option value="Dr. José">Dr. José</option>
-          <option value="Dra. Maria">Dra. Maria</option>
-        </select>
+        <div class="form-group">
+          <label for="data">Data</label>
+          <input type="date" id="data" name="data" required>
+        </div>
+
+        <div class="form-group">
+          <label for="hora">Hora</label>
+          <select id="hora" name="hora" required>
+            <option value="">Selecione um horário</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="medico">Profissional</label>
+          <select id="medico" name="medico" required>
+            <option value="">Selecione um profissional</option>
+            <option value="Clínico Geral - Dr. João Silva">Clínico Geral - Dr. João Silva</option>
+            <option value="Dentista - Dra. Mariana Costa">Dentista - Dra. Mariana Costa</option>
+            <option value="Pediatra - Dra. Ana Souza">Pediatra - Dra. Ana Souza</option>
+            <option value="Enfermeiro - Enf. Carlos Pereira">Enfermeiro - Enf. Carlos Pereira</option>
+            <option value="Ginecologista - Dra. Fernanda Oliveira">Ginecologista - Dra. Fernanda Oliveira</option>
+          </select>
+        </div>
+
+        <input type="hidden" name="pacienteId" value="<%= pacienteId %>">
 
         <button type="submit">Agendar</button>
+
       </form>
     </section>
-    <section>
-      <h2>Consultas Agendadas</h2>
+
+    <!-- LISTA DE PROFISSIONAIS -->
+    <section class="card">
+      <h2>Profissionais disponíveis</h2>
+
       <ul>
-        <% consultas.forEach(consulta => { %>
-          <li>
-            <strong>Data:</strong> <%= consulta.data %>
-            <strong>Hora:</strong> <%= consulta.hora %>
-            <strong>Médico:</strong> <%= consulta.medico %>
-          </li>
-        <% }); %>
+        <li>Clínico Geral - Dr. João Silva</li>
+        <li>Dentista - Dra. Mariana Costa</li>
+        <li>Pediatra - Dra. Ana Souza</li>
+        <li>Enfermeiro - Enf. Carlos Pereira</li>
+        <li>Ginecologista - Dra. Fernanda Oliveira</li>
       </ul>
+      
     </section>
+
   </main>
+
+  <!-- SCRIPT: BLOQUEAR DATAS PASSADAS -->
+  <script>
+    const hoje = new Date().toISOString().split("T")[0];
+    document.getElementById("data").setAttribute("min", hoje);
+  </script>
+
+  <script>
+    const selectHora = document.getElementById("hora");
+
+    function gerarHorarios() {
+      let inicio = 7 * 60;   // 07:00 em minutos
+      let fim = 11 * 60 + 30; // 11:30 em minutos
+
+      for (let minutos = inicio; minutos <= fim; minutos += 30) {
+        let horas = Math.floor(minutos / 60);
+        let mins = minutos % 60;
+
+        let horario =
+          String(horas).padStart(2, "0") +
+          ":" +
+          String(mins).padStart(2, "0");
+
+        let option = document.createElement("option");
+        option.value = horario;
+        option.textContent = horario;
+
+        selectHora.appendChild(option);
+      }
+    }
+
+    gerarHorarios();
+  </script>
+
 </body>
 </html>

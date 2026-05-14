@@ -1,16 +1,19 @@
-// config/database.js
 const { Sequelize } = require('sequelize');
 const path = require('path');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: path.join(__dirname, '..', 'database.sqlite'), // arquivo SQLite na raiz do projeto
-  logging: false, // desliga logs SQL no console
+  storage: path.join(__dirname, '..', 'database.sqlite'),
+  logging: false,
 });
 
-// Teste de conexão (opcional)
-sequelize.authenticate()
-  .then(() => console.log('Conexão com o banco de dados estabelecida com sucesso.'))
-  .catch(err => console.error('Não foi possível conectar ao banco de dados:', err));
+async function connect() {
+  try {
+    await sequelize.authenticate();
+    console.log('Banco conectado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao conectar no banco:', error);
+  }
+}
 
-module.exports = sequelize;
+module.exports = { sequelize, connect };

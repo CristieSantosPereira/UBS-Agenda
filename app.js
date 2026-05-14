@@ -1,75 +1,121 @@
 const express = require('express');
-const app = express();
 const path = require('path');
 
-// Configuração do EJS
+const { connect } = require('./config/database');
+const Paciente = require('./models/paciente');
+const Consulta = require('./models/consulta');
+
+const app = express();
+
+// Conectar ao banco
+connect();
+
+// Configurações
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Servir arquivos estáticos (coloque antes das rotas)
+// Arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware para parsear requisições
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 
-// Rota para a página inicial
+// =============================
+// ROTA INICIAL
+// =============================
 app.get('/', (req, res) => {
   res.render('index');
 });
 
-// Array temporário para armazenar consultas (em memória)
-let consultas = [
-  { data: '2022-01-01', hora: '09:00', medico: 'Dr. José' },
-  { data: '2022-02-01', hora: '10:00', medico: 'Dra. Maria' }
-];
+// =============================
+// PÁGINA DE CONSULTAS
+// =============================
+app.get('/consultas/:pacienteId', (req, res) => {
+  const pacienteId = req.params.pacienteId;
 
-// Rota para a página de consultas
-app.get('/consultas', (req, res) => {
-  res.render('consultas', { consultas });
+  res.render('consultas', { pacienteId });
 });
 
-// Rota POST para agendar nova consulta
-app.post('/consultas', (req, res) => {
-  const { data, hora, medico } = req.body;
-  consultas.push({ data, hora, medico });
-  // Redireciona para o perfil (ajuste para /perfil/:id se tiver o id do paciente)
-  res.redirect('/perfil');
+// =============================
+// PERFIL DO PACIENTE
+// =============================
+app.get('/perfil/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const paciente = await Paciente.buscarPorId(id);
+    const consultas = await Consulta.buscarPorPaciente(id);
+
+    res.render('perfil', { paciente, consultas });
+
+  } catch (error) {
+    console.error(error);
+    res.send('Erro ao carregar perfil');
+  }
 });
 
-// Rota para a página de perfil
-app.get('/perfil', (req, res) => {
-  const paciente = {
-    nome: 'João Silva',
-    data_nascimento: '1990-01-01',
-    cpf: '123.456.789-00',
-    cartao_sus: '123456789012345',
-    telefone: '(11) 1234-5678',
-    email: 'joao.silva@example.com'
-  };
+// =============================
+// CADASTRAR PACIENTE
+// =============================
+app.post('/paciente', async (req, res) => {
+  try {
+    const {
+      nome,
+      data_nascimento,
+      cpf,
+      cartao_sus,
+      telefone,
+      email
+    } = req.body;
 
-  const consultas = [
-    {
-      data: '2022-01-01',
-      medico: 'Dr. José',
-      observacoes: 'Consulta de rotina'
-    },
-    {
-      data: '2022-02-01',
-      medico: 'Dr. Maria',
-      observacoes: 'Retorno'
+    const pacienteId = await Paciente.criar({
+      nome,
+      data_nascimento,
+      cpf,
+      cartao_sus,
+      telefone,
+      email
+    });
+
+    // REDIRECT CORRETO
+    res.redirect(`/consultas/${pacienteId}`);
+
+  } catch (error) {
+    console.error(error);
+    res.send('Erro ao cadastrar paciente');
+  }
+});
+
+// =============================
+// AGENDAR CONSULTA
+// =============================
+app.post('/consultas', async (req, res) => {
+  try {
+    const { data, hora, medico, pacienteId } = req.body;
+
+    const existentes = await Consulta.buscarPorData(data);
+
+    const ocupado = existentes.find(c => c.hora === hora);
+
+    if (ocupado) {
+      return res.send("Esse horário já foi escolhido!");
     }
-  ];
 
-  res.render('perfil', { paciente, consultas });
+    await Consulta.criar(data, hora, medico, pacienteId);
+
+    res.redirect(`/perfil/${pacienteId}`);
+
+  } catch (error) {
+    console.error(error);
+    res.send("Erro ao agendar consulta");
+  }
 });
 
-app.post('/paciente', (req, res) => {
-  // Aqui você pode salvar os dados ou apenas exibir uma mensagem de sucesso
-  res.redirect('/consultas');
-});
-
-// Iniciar o servidor
+// =============================
+// SERVIDOR
+// =============================
 const port = 1000;
+
 app.listen(port, () => {
   console.log(`Servidor iniciado na porta ${port}`);
 });

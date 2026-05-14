@@ -6,64 +6,74 @@
   <title>Perfil do Paciente</title>
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-  <header>
-    <h1>Perfil do Paciente</h1>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-content">
+      <h1> Área do Paciente</h1>
+    </div>
   </header>
-  <main>
-    <section>
-      <h2>Dados Pessoais</h2>
-      <ul>
-        <li><strong>Nome:</strong> <%= paciente.nome %></li>
-        <li><strong>Data de Nascimento:</strong> <%= paciente.data_nascimento %></li>
-        <li><strong>CPF:</strong> <%= paciente.cpf %></li>
-        <li><strong>Cartão do SUS:</strong> <%= paciente.cartao_sus %></li>
-        <li><strong>Telefone:</strong> <%= paciente.telefone %></li>
-        <li><strong>E-mail:</strong> <%= paciente.email %></li>
-      </ul>
-    </section>
-    <section>
-      <h2>Histórico de Consultas</h2>
-      <ul>
-        <% consultas.forEach(consulta => { %>
-          <li>
-            <strong>Data:</strong> <%= consulta.data %>
-            <strong>Médico:</strong> <%= consulta.medico %>
-            <strong>Observações:</strong> <%= consulta.observacoes %>
-          </li>
-        <% }); %>
-      </ul>
-    </section>
+
+  <main class="container">
+
+    <!-- ALERTA -->
+    <div class="alert">
+      <strong>✔ Agendamento confirmado!</strong>
+      <span>Confira os detalhes abaixo.</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- PERFIL -->
+      <section class="card perfil">
+        <h2>👤 Dados do Paciente</h2>
+
+        <div class="info-grid">
+          <p><span>Nome</span><%= paciente.nome %></p>
+          <p><span>Nascimento</span><%= paciente.data_nascimento %></p>
+          <p><span>CPF</span><%= paciente.cpf %></p>
+          <p><span>Cartão SUS</span><%= paciente.cartao_sus %></p>
+          <p><span>Telefone</span><%= paciente.telefone %></p>
+          <p><span>E-mail</span><%= paciente.email %></p>
+        </div>
+      </section>
+
+      <!-- CONSULTAS -->
+      <section class="card consultas">
+        <h2>📅 Consultas</h2>
+
+        <% if (consultas.length === 0) { %>
+          <p>Nenhuma consulta encontrada.</p>
+        <% } else { %>
+
+          <% consultas.forEach(consulta => { %>
+            <div class="consulta-card">
+              <div class="linha">
+                <strong>📅</strong> <%= consulta.data %>
+              </div>
+              <div class="linha">
+                <strong>⏰</strong> <%= consulta.hora %>
+              </div>
+              <div class="linha destaque">
+                <%= consulta.medico %>
+              </div>
+            </div>
+          <% }); %>
+
+        <% } %>
+      </section>
+
+    </div>
+
+    <!-- AÇÕES -->
+    <div class="acoes">
+      <a href="/consultas" class="btn">+ Nova Consulta</a>
+      <a href="/" class="btn secundario">Voltar</a>
+    </div>
+
   </main>
+
 </body>
 </html>
-
-Esse arquivo usa a sintaxe do EJS para renderizar dados dinâmicos. Você precisará passar os dados do paciente e do histórico de consultas para a view a partir do arquivo app.js.
-
-Por exemplo, você pode passar os dados da seguinte forma:
-
-app.get('/perfil', (req, res) => {
-  const paciente = {
-    nome: 'João Silva',
-    data_nascimento: '1990-01-01',
-    cpf: '123.456.789-00',
-    cartao_sus: '123456789012345',
-    telefone: '(11) 1234-5678',
-    email: 'joao.silva@example.com'
-  };
-
-  const consultas = [
-    {
-      data: '2022-01-01',
-      medico: 'Dr. José',
-      observacoes: 'Consulta de rotina'
-    },
-    {
-      data: '2022-02-01',
-      medico: 'Dr. Maria',
-      observacoes: 'Retorno'
-    }
-  ];
-
-  res.render('perfil', { paciente, consultas });
-});
